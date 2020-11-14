@@ -16,8 +16,18 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import org.w3c.dom.Text;
 
 public class Login extends AppCompatActivity {
+
+    // 다른 액티비티에서 이 액티비티 종료 시키기 위해 사용
+    public static Login loginActivity;
 
     // auth
     private FirebaseAuth mAuth;
@@ -30,6 +40,7 @@ public class Login extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTitle("Table Talk");
         setContentView(R.layout.activity_login);
 
         // Initialize Firebase Auth
@@ -37,6 +48,8 @@ public class Login extends AppCompatActivity {
 
         mEmail = (TextView) findViewById(R.id.mEmail);
         mPassword = (TextView) findViewById(R.id.mPassword);
+
+        loginActivity = Login.this;
     }
 
     // 사용자가 로그인 되어 있는지 확인
@@ -44,19 +57,27 @@ public class Login extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
+        Intent intent = getIntent();
+        boolean logout = intent.getBooleanExtra("logout", true);
+
+        if(!logout)
+            return;
+
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
         updateUI(currentUser);
     }
 
+    // 로그인
     private void signIn(String email, String password) {
         Log.d(TAG, "signIn:" + email);
+        // 로그인 형식 확인
         if (!validateForm()) {
             return;
         }
 
 
-        // [START sign_in_with_email]
+        // firebase에 로그인 정보 전달
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -76,7 +97,6 @@ public class Login extends AppCompatActivity {
                         }
                     }
                 });
-        // [END sign_in_with_email]
     }
 
     private boolean validateForm() {
@@ -105,15 +125,48 @@ public class Login extends AppCompatActivity {
         return valid;
     }
 
-    private void signOut() {
-        mAuth.signOut();
-        updateUI(null);
-    }
-
+    // 로그인 성공했을때 호출되거나 맨 처음 호출됨
     private void updateUI(FirebaseUser user) {
         if(user != null) {
             Toast.makeText(Login.this, "update UI",
                     Toast.LENGTH_SHORT).show();
+
+            // realtime database 에 UId 폴더 까지 경로
+            final FirebaseDatabase database = FirebaseDatabase.getInstance();
+            DatabaseReference ref = database.getReference("userdata");
+            String UId = user.getUid();
+            DatabaseReference usersRef = ref.child("users/" + UId);
+
+            Intent idintent = new Intent(this, ChooseIdPopupActivity.class);
+            Intent mainintent = new Intent(this, MainActivity.class);
+
+            // 아이디를 만들고(아이디가 있으면) MainActivity 호출
+            usersRef.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    // nickname이 database 에 존재 할 경우(회원가입 완료 + nickname 존재)
+                    User nickname = dataSnapshot.getValue(User.class);
+                    if(nickname != null) {
+                        mainintent.putExtra("nickname", nickname.nickname);
+                        Log.d(TAG, "nickname이 firebase에 있음");
+                        startActivity(mainintent);
+                        finish();
+                    }
+                    // nickname 이 database 에 없을경우(회원가입만 하고 nickname 미생성)
+                    // 자동으로 id입력이 뜨는걸 방지하기 위해 mEamil 이 비어 있지 않아야 함.
+                    else {
+                        if(!TextUtils.isEmpty(mEmail.getText().toString())) {
+                            Log.d(TAG, "nickname이 firebase에 없음");
+                            startActivity(idintent);
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Log.d(TAG, "The read failed: " + databaseError.getCode());
+                }
+            });
         }
     }
 
@@ -124,9 +177,9 @@ public class Login extends AppCompatActivity {
         signIn(email, password);
     }
 
+    // 회원가입 버튼 클릭
     public void onSignUpButtonClicked(View v) {
         Intent intent = new Intent(getApplicationContext(), SignUpActivity.class);
         startActivity(intent);
-        finish();
     }
 }

@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center_horizontal"
-            android:text="아이디 생성(2~8자)"
+            android:text="아이디 생성(2~10자)"
             android:textSize="24sp" />
 
     </LinearLayout>
@@ -47,6 +47,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:onClick="onIdButtonClicked"
             android:text="아이디생성"
             android:textSize="24sp" />
     </LinearLayout>

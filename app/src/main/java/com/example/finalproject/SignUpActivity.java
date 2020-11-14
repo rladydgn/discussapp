@@ -16,8 +16,16 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class SignUpActivity extends AppCompatActivity {
+
+    // 다른 액티비티에서 이 액티비티 종료 시키기 위해 사용
+    public static SignUpActivity signUpActivity;
 
     // auth
     private FirebaseAuth mAuth;
@@ -38,6 +46,8 @@ public class SignUpActivity extends AppCompatActivity {
         mEmail = (TextView) findViewById(R.id.email);
         mPassword = (TextView) findViewById(R.id.password);
         mCheckPassword = (TextView) findViewById(R.id.checkPassword);
+
+        signUpActivity = SignUpActivity.this;
     }
 
     // email이 비었는지, password가 비었는지, password와 checkPassword가 다른지 확인
@@ -109,14 +119,15 @@ public class SignUpActivity extends AppCompatActivity {
 
     // 회원가입 완료시 아이디 생성 팝업
     private void updateUI(FirebaseUser user) {
-        Toast.makeText(SignUpActivity.this, "updateUI @@",
-                Toast.LENGTH_SHORT).show();
         if(user != null) {
+            Toast.makeText(SignUpActivity.this, "updateUI @@",
+                    Toast.LENGTH_SHORT).show();
+
+            // id 생성 popup 창 이동
             String UId = user.getUid();
             Intent intent = new Intent(this, ChooseIdPopupActivity.class);
             intent.putExtra("UId", UId);
             startActivity(intent);
         }
-
     }
 }
