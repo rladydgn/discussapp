@@ -48,8 +48,6 @@ public class ChooseIdPopupActivity extends Activity {
         Intent intent = getIntent();
         String data = intent.getStringExtra("UId");
 
-        // firebase realtime database에 uid와 id 매칭하기 위한 path
-        DatabaseReference myRef = database.getReference("UID/" + data + "/");
     }
 
     @Override
@@ -103,7 +101,7 @@ public class ChooseIdPopupActivity extends Activity {
         String UId = currentUser.getUid();
 
         // 유저정보를 firebase realtime database 에 저장
-        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+        //final FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference ref = database.getReference("userdata");
         DatabaseReference usersRef = ref.child("users/" + UId);
 
