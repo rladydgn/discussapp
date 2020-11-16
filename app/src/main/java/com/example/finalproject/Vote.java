@@ -15,13 +15,18 @@ public class Vote {
         middleVote = 0;
     }
 
-    Vote(int total, int yes, int middle, int no, String UId) {
+    Vote(int total, int yes, int middle, int no, ArrayList<String> UId) {
         totalVote = total;
         yesVote = yes;
         noVote = no;
         middleVote = middle;
-        UIdList.add(UId);
+        UIdList = UId;
     }
+
+    public void plusYesVote() { yesVote += 1; }
+    public void plusTotalVote() { totalVote += 1; }
+    public void plusNoVote() { noVote += 1; }
+    public void plusMiddleVote() { middleVote += 1; }
 
     public int getYesVote() {
         return yesVote;

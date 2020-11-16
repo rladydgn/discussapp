@@ -75,33 +75,69 @@ public class DayTalkActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public void onClick(View v) {
         int id = v.getId();
-        int yes = Integer.parseInt(yesCount.getText().toString());
-        int no = Integer.parseInt(noCount.getText().toString());
-        int middle = Integer.parseInt(middleCount.getText().toString());
 
         DatabaseReference ref = database.getReference("postData/fourteenBoy/vote");
 
-        if(id == R.id.yesButton) {
-            yes += 1;
-        }
-        else if(id == R.id.middleButton) {
-            middle += 1;
-        }
-        else if(id == R.id.noButton) {
-            no += 1;
-        }
         // 버튼 비활성화
         yesButton.setEnabled(false);
         middleButton.setEnabled(false);
         noButton.setEnabled(false);
 
-        // 변화값 저장
+        // 저장된 값 불러오기
         FirebaseUser currentUser = mAuth.getCurrentUser();
         String UId = mAuth.getUid();
-        Vote vote = new Vote(yes+middle+no, yes, middle, no, UId);
-        ref.setValue(vote);
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                // firebase에 저장된 Vote class 불러오기
+                Vote vote = snapshot.getValue(Vote.class);
+                if(vote == null) {
+                    ArrayList<String> UIdList = new ArrayList<String>();
+                    UIdList.add(UId);
+                    Vote newVote = new Vote(0, 0, 0, 0, UIdList);
 
-        // 변화값 불러오기
+                    if(id == R.id.yesButton)
+                        newVote.plusYesVote();
+                    else if (id == R.id.middleButton)
+                        newVote.plusMiddleVote();
+                    else if (id == R.id.noButton)
+                        newVote.plusNoVote();
+                    newVote.plusTotalVote();
+
+                    // 새로운 객체 firebase에 저장
+                    ref.setValue(newVote);
+                }
+                else {
+                    int totalVote = vote.getTotalVote();
+                    int yesVote = vote.getYesVote();
+                    int middleVote = vote.getMiddleVote();
+                    int noVote = vote.getNoVote();
+                    ArrayList<String> UIdList = vote.getUidList();
+                    UIdList.add(UId);
+                    Log.d(TAG, UIdList.get(0));
+
+                    // 새로운 vote 클래스 객체 생성
+                    Vote newVote = new Vote(totalVote, yesVote, middleVote, noVote, UIdList);
+                    if (id == R.id.yesButton)
+                        newVote.plusYesVote();
+                    else if (id == R.id.middleButton)
+                        newVote.plusMiddleVote();
+                    else if (id == R.id.noButton)
+                        newVote.plusNoVote();
+                    newVote.plusTotalVote();
+
+                    // 새로운 객체 firebase에 저장
+                    ref.setValue(newVote);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e(TAG, "in onClick call canceled");
+            }
+        });
+
+        // 새로 저장한 후 저장한 값 불러오기
         BackgroundThread thread = new BackgroundThread();
         thread.start();
     }
@@ -128,7 +164,7 @@ public class DayTalkActivity extends AppCompatActivity implements View.OnClickLi
                         // 버튼을 클릭한 이력이 있을 시 버튼 비활성화
                         GenericTypeIndicator<ArrayList<String>> t = new GenericTypeIndicator<ArrayList<String>>() {};
                         ArrayList<String> UIdList = snapshot.child("uidList").getValue(t);
-                        Log.e(TAG, UIdList.get(0) + " @@ " + UId);
+                        //Log.e(TAG, UIdList.get(0) + " @@ " + UId);
                         if(UIdList.contains(UId)){
                             // 버튼 비활성화
                             yesButton.setEnabled(false);
