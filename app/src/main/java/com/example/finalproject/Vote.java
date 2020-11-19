@@ -6,7 +6,6 @@ import java.util.ArrayList;
 public class Vote {
     private int totalVote;
     private int yesVote, noVote, middleVote;
-    private ArrayList<String> UIdList = new ArrayList<String>();
 
     Vote() {
         totalVote = 0;
@@ -15,12 +14,11 @@ public class Vote {
         middleVote = 0;
     }
 
-    Vote(int total, int yes, int middle, int no, String UId) {
+    Vote(int total, int yes, int middle, int no) {
         totalVote = total;
         yesVote = yes;
         noVote = no;
         middleVote = middle;
-        UIdList.add(UId);
     }
 
     public int getYesVote() {
@@ -37,10 +35,6 @@ public class Vote {
 
     public int getMiddleVote() {
         return middleVote;
-    }
-
-    public ArrayList<String> getUidList() {
-        return UIdList;
     }
 
 }

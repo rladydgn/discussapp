@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView textEdit;
     // 투표율
     private TextView dayYes, dayMiddle, dayNo, topic;
+    private TextView nickText;
 
     private FirebaseAuth mAuth;
 
@@ -47,12 +48,14 @@ public class MainActivity extends AppCompatActivity {
         SignUpActivity signUpActivity = (SignUpActivity) SignUpActivity.signUpActivity;
         signUpActivity.finish();*/
 
+        // textView
         textEdit = (TextView) findViewById(R.id.textEdit);
         topic = (TextView) findViewById(R.id.topic);
         // 투표율 100dp 기준 3등분 배분
         dayYes = (TextView) findViewById(R.id.dayYes);
         dayMiddle = (TextView) findViewById(R.id.dayMiddle);
         dayNo = (TextView) findViewById(R.id.dayNo);
+        nickText = (TextView) findViewById(R.id.nickText);
 
         Intent intent = getIntent();
 
@@ -61,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = mAuth.getCurrentUser();
 
-        textEdit.setText(nickname + " " + currentUser.getUid());
+        nickText.setText(nickname);
 
     }
 

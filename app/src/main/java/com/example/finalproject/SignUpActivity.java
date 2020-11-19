@@ -73,6 +73,7 @@ public class SignUpActivity extends AppCompatActivity {
         else if(!password.equals(checkPassword)) {
             mPassword.setError("different password");
             mCheckPassword.setError("different password");
+            valid = false;
         }
         else {
             mPassword.setError(null);
