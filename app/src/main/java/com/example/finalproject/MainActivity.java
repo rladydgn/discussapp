@@ -1,5 +1,6 @@
 package com.example.finalproject;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -30,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView nickText;
 
     private FirebaseAuth mAuth;
+    FirebaseDatabase database = FirebaseDatabase.getInstance();
 
     // logcat
     private static final String TAG = "MainActivity";
@@ -89,11 +91,38 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateUI(FirebaseUser user) {
-        int totalPx = dpToPx(200);
-        dayYes.setWidth(totalPx/3);
-        dayMiddle.setWidth(totalPx/3);
-        dayNo.setWidth(totalPx/3);
-        Log.d(TAG, Math.round(totalPx/3) + " " + totalPx);
+
+        DatabaseReference ref = database.getReference("postData/fourteenBoy");
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                FirebaseUser currentUser = mAuth.getCurrentUser();
+                String UId = mAuth.getUid();
+
+
+                // 투표수 불러오기
+                Vote vote = snapshot.child("voteRate").getValue(Vote.class);
+                if (vote != null) {
+
+                    int yes = vote.getYesVote();
+                    int middle = vote.getMiddleVote();
+                    int no = vote.getNoVote();
+
+                    // 비율 조정
+                    int totalDp = 200;
+                    int totalPx = dpToPx(totalDp);
+                    double totalVote = yes + no + middle;
+                    dayYes.setWidth(Integer.parseInt(String.valueOf(Math.round(totalPx * (yes / totalVote)))));
+                    dayMiddle.setWidth(Integer.parseInt(String.valueOf(Math.round(totalPx * (middle / totalVote)))));
+                    dayNo.setWidth(Integer.parseInt(String.valueOf(Math.round(totalPx * (no / totalVote)))));
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.d(TAG, "call vote failed");
+            }
+        });
     }
 
     private int dpToPx(int dp) {
