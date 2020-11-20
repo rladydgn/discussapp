@@ -167,7 +167,6 @@ public class DayTalkActivity extends AppCompatActivity implements View.OnClickLi
                         orderRef.orderByChild("comment/timeOrder");
                         ref.setValue(comment);
 
-
                         return true;
                     }
                 }
@@ -176,18 +175,18 @@ public class DayTalkActivity extends AppCompatActivity implements View.OnClickLi
         });
     } // end of onCreate
 
-    @Override
+/*    @Override
     protected void onStart() {
         super.onStart();
 
         updateUI();
-    }
+    }*/
 
     // 댓글 양식
     private TextView setTextView(String text) {
 
         // 엔터 누르면 텍스트 하나 생성하고 댓글창에 텍스트 추가, firebase에 저장
-        Log.d(TAG, "test success");
+        Log.d(TAG,  "test success");
         // 텍스트뷰 생성
         TextView text1 = new TextView(getApplicationContext());
         int sp = spToPx(8);
@@ -242,8 +241,8 @@ public class DayTalkActivity extends AppCompatActivity implements View.OnClickLi
     }
 
 
-    private void updateUI() {
-    }
+    /*private void updateUI() {
+    }*/
 
     private int dpToPx(int dp) {
         Resources resources = this.getResources();

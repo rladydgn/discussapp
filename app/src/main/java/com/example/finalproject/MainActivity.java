@@ -25,7 +25,6 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
-    private TextView textEdit;
     // 투표율
     private TextView dayYes, dayMiddle, dayNo, topic;
     private TextView nickText;
@@ -49,7 +48,6 @@ public class MainActivity extends AppCompatActivity {
         signUpActivity.finish();*/
 
         // textView
-        textEdit = (TextView) findViewById(R.id.textEdit);
         topic = (TextView) findViewById(R.id.topic);
         // 투표율 100dp 기준 3등분 배분
         dayYes = (TextView) findViewById(R.id.dayYes);
